@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SeniorCQCAssignment.Framework\SeniorCQCAssignment.Framework.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Selenium.WebDriver" />
+		<PackageReference Include="Bogus" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Components\" />
+		<Folder Include="Steps\" />
+	</ItemGroup>
+
+</Project>

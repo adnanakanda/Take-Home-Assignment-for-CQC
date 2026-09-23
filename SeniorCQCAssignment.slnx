@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SeniorCQCAssignment.Automation/SeniorCQCAssignment.Automation.csproj" Id="3aadfccf-8a97-4c9b-aaf6-98121a873c12" />
+  <Project Path="SeniorCQCAssignment.Framework/SeniorCQCAssignment.Framework.csproj" Id="11ced407-3a6f-4005-8e61-7f2621e52a9e" />
+  <Project Path="SeniorCQCAssignment.Tests/SeniorCQCAssignment.Tests.csproj" Id="28f25f6a-130d-441f-a653-c06ebd2a72b4" />
+</Solution>
