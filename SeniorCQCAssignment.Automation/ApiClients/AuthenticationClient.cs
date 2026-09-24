@@ -13,11 +13,7 @@ public sealed class AuthenticationClient : ApiClientBase
     {
     }
 
-    public Task<ApiResponse<LoginResponse>> LoginAsync(
-        LoginRequest request,
-        CancellationToken cancellationToken = default) =>
-        PostAsync<LoginRequest, LoginResponse>(
-            LoginEndpoint,
-            request,
-            cancellationToken);
+    public Task<ApiResponse<LoginResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+        =>
+        PostAsync<LoginRequest, LoginResponse>(LoginEndpoint, request, cancellationToken);
 }

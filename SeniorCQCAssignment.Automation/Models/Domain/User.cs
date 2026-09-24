@@ -4,6 +4,6 @@ public sealed record User
 (
     string Email,
     string Password,
-    string? SecurityQuestion = null,
-    string? SecurityAnswer = null
+    int SecurityQuestionId,
+    string SecurityAnswer
 );

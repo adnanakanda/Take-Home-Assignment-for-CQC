@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SeniorCQCAssignmnet.Tests.AQFramework.Models
+﻿namespace SeniorCQCAssignmnet.Tests.AQFramework.Models
 {
     public class User
     {

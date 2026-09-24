@@ -1,33 +1,34 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeniorCQCAssignment.Framework.Configuration;
+using SeniorCQCAssignment.Framework.Logging;
 
-namespace SeniorCQCAssignment.Framework.WebDrivers
+namespace SeniorCQCAssignment.Framework.WebDriver
 {
     public static class WebDriverFactory
     {
-        public static IWebDriver Create(TestConfiguration configuration)
+        public static IWebDriver Create(TestConfiguration configuration, ILogger logger)
         {
             return configuration.Browser.ToLowerInvariant() switch
             {
-                "chrome" => CreateChromeDriver(configuration),
+                "chrome" => CreateChromeDriver(configuration, logger),
                 _ => throw new NotSupportedException(
                     $"Browser '{configuration.Browser}' is not supported.")
             };
         }
 
-        private static IWebDriver CreateChromeDriver(TestConfiguration configuration)
+        private static IWebDriver CreateChromeDriver(TestConfiguration configuration, ILogger logger)
         {
+            logger.Information("Creating Chrome driver");
+
             var options = new ChromeOptions();
 
             if (configuration.Headless)
             {
+                logger.Information("Running Chrome in headless mode");
+
                 options.AddArgument("--headless=new");
             }
-
-            options.AddArgument("--window-size=1920,1080");
-            options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--no-sandbox");
 
             return new ChromeDriver(options);
         }

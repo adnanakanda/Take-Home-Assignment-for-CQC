@@ -11,8 +11,8 @@ public static class UserFactory
                 new User(
                     Email: faker.Internet.Email(),
                     Password: GeneratePassword(),
-                    SecurityQuestion: "Your favorite book?",
-                    SecurityAnswer: faker.Lorem.Sentence(5)
+                    SecurityQuestionId: 3,
+                    SecurityAnswer: faker.Lorem.Word()
                 ));
 
     public static User Create() => UserFaker.Generate();
