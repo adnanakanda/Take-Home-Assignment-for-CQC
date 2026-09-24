@@ -19,7 +19,7 @@ public sealed class LoggingHandler : DelegatingHandler
         {
             var requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
 
-            _logger.Debug($"Request Body: {requestBody}");
+            _logger.Debug($"Request Body: {MaskSensitiveData(requestBody)}");
         }
 
         var response = await base.SendAsync(request, cancellationToken);
@@ -38,6 +38,8 @@ public sealed class LoggingHandler : DelegatingHandler
         {
             return body;
         }
-        return body.Replace("\"token\":\"", "\"token\":\"***MASKED***");
+        return body
+        .Replace("\"token\":\"", "\"token\":\"***MASKED***")
+        .Replace("\"password\":\"", "\"password\":\"***MASKED***");
     }
 }

@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
+using SeniorCQCAssignment.Automation.Models.Domain;
 using SeniorCQCAssignment.Framework.Elements;
-using SeniorCQCAssignmnet.Tests.AQFramework.Models;
 
 namespace SeniorCQCAssignment.Automation.Pages;
 

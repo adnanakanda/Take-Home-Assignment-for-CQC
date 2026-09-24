@@ -2,7 +2,7 @@
 using SeniorCQCAssignment.Automation.Models.Api.Requests;
 using SeniorCQCAssignment.Automation.Models.Domain;
 
-namespace SeniorCQCAssignment.Automation.Steps;
+namespace SeniorCQCAssignment.Automation.Api.Steps;
 
 public sealed class UserSteps
 {
