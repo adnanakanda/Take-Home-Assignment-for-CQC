@@ -54,4 +54,51 @@ public abstract class ApiClientBase
             Data = data
         };
     }
+    protected async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
+    {
+        using var response = await HttpClient.GetAsync(endpoint, cancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        TResponse? data = default;
+
+        if (!string.IsNullOrWhiteSpace(responseBody))
+        {
+            try
+            {
+                data =
+                    JsonSerializer.Deserialize<TResponse>(
+                        responseBody,
+                        JsonOptions);
+            }
+            catch (JsonException)
+            {
+                data = default;
+            }
+        }
+
+        return new ApiResponse<TResponse>
+        {
+            StatusCode = response.StatusCode,
+            RequestBody = string.Empty,
+            ResponseBody = responseBody,
+            Data = data
+        };
+    }
+
+    protected async Task<ApiResponse<TResponse>> DeleteAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
+    {
+        using var response = await HttpClient.DeleteAsync(endpoint, cancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        var data = string.IsNullOrWhiteSpace(responseBody)
+            ? default
+            : JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
+
+        return new ApiResponse<TResponse>
+        {
+            StatusCode = response.StatusCode,
+            RequestBody = string.Empty,
+            ResponseBody = responseBody,
+            Data = data
+        };
+    }
 }

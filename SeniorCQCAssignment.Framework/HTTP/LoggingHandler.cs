@@ -6,7 +6,7 @@ public sealed class LoggingHandler : DelegatingHandler
 {
     private readonly ILogger _logger;
 
-    public LoggingHandler(ILogger logger) : base(new HttpClientHandler())
+    public LoggingHandler(ILogger logger)
     {
         _logger = logger;
     }
@@ -24,11 +24,13 @@ public sealed class LoggingHandler : DelegatingHandler
 
         var response = await base.SendAsync(request, cancellationToken);
 
-        var responseBody = response.Content is null ? string.Empty : await response.Content.ReadAsStringAsync(cancellationToken);
+        var responseBody =
+            response.Content is null
+                ? string.Empty
+                : await response.Content.ReadAsStringAsync(cancellationToken);
 
         _logger.Debug($"Response {(int)response.StatusCode}: {MaskSensitiveData(responseBody)}");
 
-        response.Content = new StringContent(responseBody, System.Text.Encoding.UTF8, "application/json");
         return response;
     }
 
@@ -38,8 +40,13 @@ public sealed class LoggingHandler : DelegatingHandler
         {
             return body;
         }
+
         return body
-        .Replace("\"token\":\"", "\"token\":\"***MASKED***")
-        .Replace("\"password\":\"", "\"password\":\"***MASKED***");
+            .Replace(
+                "\"token\":\"",
+                "\"token\":\"***MASKED***")
+            .Replace(
+                "\"password\":\"",
+                "\"password\":\"***MASKED***");
     }
 }

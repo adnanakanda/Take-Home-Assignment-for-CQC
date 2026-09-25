@@ -1,21 +1,27 @@
 ﻿using SeniorCQCAssignment.Automation.ApiClients;
+using SeniorCQCAssignment.Automation.Context;
+using SeniorCQCAssignment.Automation.Exceptions;
 using SeniorCQCAssignment.Automation.Models.Api.Requests;
+using SeniorCQCAssignment.Automation.Models.Api.Responses;
 using SeniorCQCAssignment.Automation.Models.Domain;
+using SeniorCQCAssignment.Framework.HTTP;
 
-namespace SeniorCQCAssignment.Automation.Api.Steps;
+namespace SeniorCQCAssignment.Automation.Steps.Api;
 
 public sealed class UserSteps
 {
     private readonly UsersClient _usersClient;
     private readonly AuthenticationClient _authenticationClient;
+    private readonly AuthenticationContext _authenticationContext;
 
-    public UserSteps(UsersClient usersClient, AuthenticationClient authenticationClient)
+    public UserSteps(UsersClient usersClient, AuthenticationClient authenticationClient, AuthenticationContext authenticationContext)
     {
         _usersClient = usersClient;
         _authenticationClient = authenticationClient;
+        _authenticationContext = authenticationContext;
     }
 
-    public async Task RegisterUserAsync(User user)
+    public async Task<ApiResponse<RegisterUserResponse>> RegisterUserAsync(User user)
     {
         var request = new RegisterUserRequest
         {
@@ -33,8 +39,10 @@ public sealed class UserSteps
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"User registration failed: {response.ResponseBody}");
+            throw new ApiException($"User registration failed: {response.ResponseBody}");
         }
+
+        return response;
     }
 
     public async Task<string> LoginUserAsync(User user)
@@ -49,12 +57,17 @@ public sealed class UserSteps
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Login failed: {response.ResponseBody}");
+            throw new ApiException($"Login failed: {response.ResponseBody}");
         }
 
-        return response.Data?
-            .Authentication?
-            .Token
-            ?? throw new InvalidOperationException("Login succeeded but token was not returned.");
+        var authentication = response.Data?.Authentication ?? throw new InvalidOperationException("Login succeeded but authentication data was not returned.");
+
+        _authenticationContext.Token = authentication.Token ?? throw new InvalidOperationException("Authentication token was not returned.");
+
+        _authenticationContext.BasketId = authentication.BasketId;
+
+        _authenticationContext.Email = authentication.Email ?? user.Email;
+
+        return _authenticationContext.Token;
     }
 }

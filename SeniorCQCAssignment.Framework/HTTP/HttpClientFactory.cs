@@ -5,15 +5,20 @@ namespace SeniorCQCAssignment.Framework.HTTP;
 
 public static class HttpClientFactory
 {
-    public static HttpClient Create(string baseUrl, ILogger logger, TimeSpan? timeout = null)
+    public static HttpClient Create(string baseUrl, ILogger logger, TimeSpan? timeout = null, HttpMessageHandler? innerHandler = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
 
-        var httpHandler = new HttpClientHandler();
+        var transportHandler = new HttpClientHandler();
+
+        if (innerHandler is DelegatingHandler delegatingHandler)
+        {
+            delegatingHandler.InnerHandler = transportHandler;
+        }
 
         var loggingHandler = new LoggingHandler(logger)
         {
-            InnerHandler = httpHandler
+            InnerHandler = innerHandler ?? transportHandler
         };
 
         var client = new HttpClient(loggingHandler)

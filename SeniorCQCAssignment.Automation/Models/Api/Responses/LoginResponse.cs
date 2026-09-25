@@ -15,4 +15,7 @@ public sealed class AuthenticationResponse
 
     [JsonPropertyName("bid")]
     public int BasketId { get; init; }
+
+    [JsonPropertyName("umail")]
+    public string Email { get; init; } = string.Empty;
 }

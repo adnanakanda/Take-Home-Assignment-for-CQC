@@ -5,10 +5,12 @@ namespace SeniorCQCAssignment.Tests.Ui;
 public class SmokeTests : UiTestBase
 {
     [Test]
-    public void JuiceShop_ShouldOpenSuccessfully()
+    public void JuiceShop_OpensSuccessfully()
     {
+        //Act
         Driver.Navigate().GoToUrl(Configuration.BaseUrl);
 
-        Assert.That(Driver.Title, Is.Not.Empty);
+        //Assert
+        Assert.That(Driver.Title, Is.Not.Empty, "Expected Juice Shop title not displayed.");
     }
 }
