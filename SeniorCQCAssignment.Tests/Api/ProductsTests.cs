@@ -1,4 +1,5 @@
-﻿using SeniorCQCAssignment.Automation.Steps.Api;
+using SeniorCQCAssignment.Automation.Steps.Api;
+using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
 using SeniorCQCAssignment.Tests.TestData;
 
@@ -7,6 +8,8 @@ namespace SeniorCQCAssignment.Tests.Api;
 public class ProductsTests : ApiTestBase
 {
     [TestCaseSource(typeof(ProductSearchData), nameof(ProductSearchData.Queries))]
+    [Category(Categories.Api)]
+    [Category(Categories.Smoke)]
     public async Task Search_Product(ProductSearchCase productsData)
     {
         //Arrange

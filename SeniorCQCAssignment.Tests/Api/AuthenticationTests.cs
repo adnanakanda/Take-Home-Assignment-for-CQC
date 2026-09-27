@@ -1,5 +1,5 @@
-﻿using SeniorCQCAssignment.Automation.Steps.Api;
 using SeniorCQCAssignment.Automation.TestData;
+using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
 
 namespace SeniorCQCAssignment.Tests.Api;
@@ -7,15 +7,16 @@ namespace SeniorCQCAssignment.Tests.Api;
 public class AuthenticationTests : ApiTestBase
 {
     [Test]
+    [Category(Categories.Api)]
+    [Category(Categories.Smoke)]
     public async Task Login_User()
     {
         //Arrange
         var user = UserFactory.Create();
-        var userSteps = new UserSteps(UsersClient, AuthenticationClient, AuthenticationContext);
 
         //Act
-        await userSteps.RegisterUserAsync(user);
-        var token = await userSteps.LoginUserAsync(user);
+        await RegisterUserAsync(user);
+        var token = await LoginUserAsync(user);
 
         //Assert
         Assert.Multiple(() =>

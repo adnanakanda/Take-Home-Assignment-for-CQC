@@ -1,10 +1,13 @@
-﻿using SeniorCQCAssignment.Tests.Fixtures;
+using SeniorCQCAssignment.Tests.Constants;
+using SeniorCQCAssignment.Tests.Fixtures;
 
 namespace SeniorCQCAssignment.Tests.Ui;
 
 public class SmokeTests : UiTestBase
 {
     [Test]
+    [Category(Categories.Ui)]
+    [Category(Categories.Smoke)]
     public void JuiceShop_OpensSuccessfully()
     {
         //Act

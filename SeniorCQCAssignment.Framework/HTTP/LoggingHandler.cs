@@ -1,4 +1,5 @@
 ﻿using SeniorCQCAssignment.Framework.Logging;
+using System.Text.RegularExpressions;
 
 namespace SeniorCQCAssignment.Framework.HTTP;
 
@@ -34,6 +35,10 @@ public sealed class LoggingHandler : DelegatingHandler
         return response;
     }
 
+    private static readonly Regex SensitiveValuePattern = new(
+        "\"(?<name>token|password|passwordRepeat|securityAnswer)\"\\s*:\\s*\"[^\"]*\"",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     private static string MaskSensitiveData(string body)
     {
         if (string.IsNullOrWhiteSpace(body))
@@ -41,12 +46,6 @@ public sealed class LoggingHandler : DelegatingHandler
             return body;
         }
 
-        return body
-            .Replace(
-                "\"token\":\"",
-                "\"token\":\"***MASKED***")
-            .Replace(
-                "\"password\":\"",
-                "\"password\":\"***MASKED***");
+        return SensitiveValuePattern.Replace(body, match => $"\"{match.Groups["name"].Value}\":\"***MASKED***\"");
     }
 }

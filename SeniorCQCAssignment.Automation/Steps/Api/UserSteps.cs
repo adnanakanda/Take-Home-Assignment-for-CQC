@@ -21,7 +21,7 @@ public sealed class UserSteps
         _authenticationContext = authenticationContext;
     }
 
-    public async Task<ApiResponse<RegisterUserResponse>> RegisterUserAsync(User user)
+    public async Task<ApiResponse<RegisterUserResponse>> RegisterUserAsync(User user, CancellationToken cancellationToken = default)
     {
         var request = new RegisterUserRequest
         {
@@ -35,7 +35,7 @@ public sealed class UserSteps
             SecurityAnswer = user.SecurityAnswer
         };
 
-        var response = await _usersClient.RegisterAsync(request);
+        var response = await _usersClient.RegisterAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -45,7 +45,7 @@ public sealed class UserSteps
         return response;
     }
 
-    public async Task<string> LoginUserAsync(User user)
+    public async Task<string> LoginUserAsync(User user, CancellationToken cancellationToken = default)
     {
         var request = new LoginRequest
         {
@@ -53,7 +53,7 @@ public sealed class UserSteps
             Password = user.Password
         };
 
-        var response = await _authenticationClient.LoginAsync(request);
+        var response = await _authenticationClient.LoginAsync(request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

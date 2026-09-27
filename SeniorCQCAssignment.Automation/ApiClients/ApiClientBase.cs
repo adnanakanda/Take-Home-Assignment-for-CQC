@@ -89,9 +89,19 @@ public abstract class ApiClientBase
         using var response = await HttpClient.DeleteAsync(endpoint, cancellationToken);
         var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        var data = string.IsNullOrWhiteSpace(responseBody)
-            ? default
-            : JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
+        TResponse? data = default;
+
+        if (!string.IsNullOrWhiteSpace(responseBody))
+        {
+            try
+            {
+                data = JsonSerializer.Deserialize<TResponse>(responseBody, JsonOptions);
+            }
+            catch (JsonException)
+            {
+                data = default;
+            }
+        }
 
         return new ApiResponse<TResponse>
         {

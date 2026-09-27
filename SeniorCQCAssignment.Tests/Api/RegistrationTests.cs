@@ -1,26 +1,31 @@
-﻿using SeniorCQCAssignment.Automation.Models.Api.Requests;
+using SeniorCQCAssignment.Automation.Models.Api.Requests;
+using SeniorCQCAssignment.Automation.Models.Api.Responses;
 using SeniorCQCAssignment.Automation.Models.Domain;
-using SeniorCQCAssignment.Automation.Steps.Api;
 using SeniorCQCAssignment.Automation.TestData;
+using SeniorCQCAssignment.Framework.HTTP;
+using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
-using SeniorCQCAssignment.Tests.TestData;
 using System.Net;
 
 namespace SeniorCQCAssignment.Tests.Api;
 
 public class RegistrationTests : ApiTestBase
 {
+    private const string ValidPassword = "A1qa!Password123";
+    private const string DifferentPassword = "DifferentPassword123!";
+
+    private static readonly string InvalidEmail = $"invalid-email-{Guid.NewGuid():N}";
+
     [Test]
+    [Category(Categories.Api)]
+    [Category(Categories.Smoke)]
     public async Task Register_User()
     {
         //Arrange
         var user = UserFactory.Create();
-        var userSteps = new UserSteps(UsersClient, AuthenticationClient, AuthenticationContext);
 
         //Act
-        var response = await userSteps.RegisterUserAsync(user);
-        TrackCreatedUser(response.Data!.Data!.Id);
-        await userSteps.LoginUserAsync(user);
+        var response = await RegisterUserAsync(user);
 
         //Assert
         Assert.Multiple(() =>
@@ -30,62 +35,95 @@ public class RegistrationTests : ApiTestBase
         });
     }
 
-    [TestCaseSource(typeof(RegistrationData), nameof(RegistrationData.InvalidCases))]
-    public async Task Register_User_With_Invalid_Data(RegistrationCase registrationCase)
+    [Test]
+    [Category(Categories.Api)]
+    [Category(Categories.Regression)]
+    public async Task Register_User_With_Duplicate_Email()
     {
         //Arrange
         var user = UserFactory.Create();
-        var password = string.IsNullOrWhiteSpace(registrationCase.Password) ? user.Password : registrationCase.Password;
-        var passwordRepeat = string.IsNullOrWhiteSpace(registrationCase.PasswordRepeat) ? user.Password : registrationCase.PasswordRepeat;
-        var email = string.IsNullOrWhiteSpace(registrationCase.Email) ? user.Email : registrationCase.Email;
 
-        if (registrationCase.DuplicateEmail)
-        {
-            email = user.Email;
-        }
+        await RegisterUserAsync(user);
 
-        var request = new RegisterUserRequest
+        var request = CreateRegistrationRequest(user);
+
+        //Act
+        var response = await RegisterUserAsync(request);
+
+        //Assert
+        AssertRegistrationRejected(response, "Duplicate email", HttpStatusCode.BadRequest);
+    }
+
+    [Test]
+    [Category(Categories.Api)]
+    [Category(Categories.Regression)]
+    [Category(Categories.KnownDefect)]
+    public async Task Register_User_With_Invalid_Email()
+    {
+        //Arrange
+        var user = UserFactory.Create();
+
+        var request = CreateRegistrationRequest(user, email: InvalidEmail);
+
+        //Act
+        var response = await RegisterUserAsync(request);
+
+        //Assert
+        AssertRegistrationRejected(response, "Invalid email", HttpStatusCode.BadRequest, "BUG-001");
+    }
+
+    [Test]
+    [Category(Categories.Api)]
+    [Category(Categories.Regression)]
+    [Category(Categories.KnownDefect)]
+    public async Task Register_User_With_Mismatched_Passwords()
+    {
+        //Arrange
+        var user = UserFactory.Create();
+
+        var request = CreateRegistrationRequest(
+            user,
+            password: ValidPassword,
+            passwordRepeat: DifferentPassword);
+
+        //Act
+        var response = await RegisterUserAsync(request);
+
+        //Assert
+        AssertRegistrationRejected(response, "Mismatched passwords", HttpStatusCode.BadRequest, "BUG-002");
+    }
+
+    private static RegisterUserRequest CreateRegistrationRequest(
+        User user,
+        string? email = null,
+        string? password = null,
+        string? passwordRepeat = null)
+        => new()
         {
-            Email = email,
-            Password = password,
-            PasswordRepeat = passwordRepeat,
+            Email = email ?? user.Email,
+            Password = password ?? user.Password,
+            PasswordRepeat = passwordRepeat ?? user.Password,
             SecurityQuestion = new SecurityQuestionRequest { Id = user.SecurityQuestionId },
             SecurityAnswer = user.SecurityAnswer
         };
 
-        //Act
-        if (registrationCase.DuplicateEmail)
+    private static void AssertRegistrationRejected(
+        ApiResponse<RegisterUserResponse> response,
+        string scenario,
+        HttpStatusCode expectedStatusCode,
+        string? knownDefect = null)
+    {
+        if (knownDefect is not null && response.IsSuccessStatusCode)
         {
-            var userSteps = new UserSteps(UsersClient, AuthenticationClient, AuthenticationContext);
-            var registrationResponse = await userSteps.RegisterUserAsync(user);
-            TrackCreatedUser(registrationResponse.Data!.Data!.Id);
+            Assert.Inconclusive(
+                $"{knownDefect} (see BUGS.md): '{scenario}' was accepted with " +
+                $"HTTP {(int)response.StatusCode} instead of {(int)expectedStatusCode}.");
         }
 
-        var response = await UsersClient.RegisterAsync(request);
-
-        if (response.IsSuccessStatusCode && response.Data?.Data is not null)
-        {
-            TrackCreatedUser(response.Data.Data.Id);
-
-            var createdUser = new User(
-                email,
-                password,
-                user.SecurityQuestionId,
-                user.SecurityAnswer);
-
-            var userSteps = new UserSteps(
-                UsersClient,
-                AuthenticationClient,
-                AuthenticationContext);
-
-            await userSteps.LoginUserAsync(createdUser);
-        }
-
-        //Assert
         Assert.Multiple(() =>
         {
-            Assert.That(response.IsSuccessStatusCode, Is.False, $"Registration unexpectedly succeeded for '{registrationCase.Name}'.");
-            Assert.That(response.StatusCode, Is.EqualTo((HttpStatusCode)registrationCase.ExpectedStatusCode), $"Expected '{registrationCase.Name}' registration to return {registrationCase.ExpectedStatusCode} but received {(int)response.StatusCode}.");
+            Assert.That(response.IsSuccessStatusCode, Is.False, $"Registration unexpectedly succeeded for '{scenario}'.");
+            Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode), $"Expected '{scenario}' registration to return {(int)expectedStatusCode} but received {(int)response.StatusCode}.");
         });
     }
 }

@@ -27,7 +27,9 @@ public static class ConfigurationProvider
 
             Headless = bool.TryParse(section["Headless"], out var headless) && headless,
 
-            ExplicitWaitSeconds = int.TryParse(section["ExplicitWaitSeconds"], out var waitSeconds) ? waitSeconds : 10
+            ExplicitWaitSeconds = int.TryParse(section["ExplicitWaitSeconds"], out var waitSeconds) ? waitSeconds : 10,
+
+            HttpTimeoutSeconds = int.TryParse(section["HttpTimeoutSeconds"], out var timeoutSeconds) ? timeoutSeconds : 60
         };
     }
 }
