@@ -1,11 +1,11 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using SeniorCQCAssignment.Framework.Logging;
 
 namespace SeniorCQCAssignment.Framework.Elements;
 
-public class Button : BaseElement
+public class PasswordTextBox : TextBox
 {
-    public Button(
+    public PasswordTextBox(
         IWebDriver driver,
         By locator,
         string name,
@@ -14,4 +14,6 @@ public class Button : BaseElement
         : base(driver, locator, name, timeout, logger)
     {
     }
+
+    protected override bool IsSecret => true;
 }

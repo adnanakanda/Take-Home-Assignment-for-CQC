@@ -19,9 +19,12 @@ namespace SeniorCQCAssignment.Framework.WebDriver
 
         private static IWebDriver CreateChromeDriver(TestConfiguration configuration, ILogger logger)
         {
-            logger.Information("Creating Chrome driver");
-
             var options = new ChromeOptions();
+
+            options.AddArgument("--window-size=1920,1080");
+
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
 
             if (configuration.Headless)
             {

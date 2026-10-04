@@ -1,3 +1,4 @@
+using SeniorCQCAssignment.Automation.Pages;
 using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
 
@@ -10,10 +11,13 @@ public class SmokeTests : UiTestBase
     [Category(Categories.Smoke)]
     public void JuiceShop_OpensSuccessfully()
     {
+
         //Act
-        Driver.Navigate().GoToUrl(Configuration.BaseUrl);
+        var homePage = new HomePage(Driver, Configuration, Logger);
+
+        homePage.WaitUntilDisplayed();
 
         //Assert
-        Assert.That(Driver.Title, Is.Not.Empty, "Expected Juice Shop title not displayed.");
+        Assert.That(Driver.Title, Is.EqualTo("OWASP Juice Shop"), "Expected the title of the home page to be 'OWASP Juice Shop'.");
     }
 }

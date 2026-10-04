@@ -1,34 +1,35 @@
 ﻿using OpenQA.Selenium;
+using SeniorCQCAssignment.Framework.Logging;
 
-namespace SeniorCQCAssignment.Framework.Elements
+namespace SeniorCQCAssignment.Framework.Elements;
+
+public class CheckBox : BaseElement
 {
-    public class CheckBox : BaseElement
+    public CheckBox(
+        IWebDriver driver,
+        By locator,
+        string name,
+        TimeSpan timeout,
+        ILogger logger)
+        : base(driver, locator, name, timeout, logger)
     {
-        public CheckBox(
-            IWebDriver driver,
-            By locator,
-            string name,
-            TimeSpan timeout)
-            : base(driver, locator, name, timeout)
+    }
+
+    public bool IsSelected() => VisibleElement.Selected;
+
+    public void Check()
+    {
+        if (!IsSelected())
         {
+            Click();
         }
+    }
 
-        public bool IsSelected() => VisibleElement.Selected;
-
-        public void Check()
+    public void Uncheck()
+    {
+        if (IsSelected())
         {
-            if (!IsSelected())
-            {
-                Click();
-            }
-        }
-
-        public void Uncheck()
-        {
-            if (IsSelected())
-            {
-                Click();
-            }
+            Click();
         }
     }
 }

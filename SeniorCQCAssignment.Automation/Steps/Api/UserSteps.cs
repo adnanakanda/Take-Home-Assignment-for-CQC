@@ -5,6 +5,7 @@ using SeniorCQCAssignment.Automation.Models.Api.Requests;
 using SeniorCQCAssignment.Automation.Models.Api.Responses;
 using SeniorCQCAssignment.Automation.Models.Domain;
 using SeniorCQCAssignment.Framework.HTTP;
+using SeniorCQCAssignment.Framework.Logging;
 
 namespace SeniorCQCAssignment.Automation.Steps.Api;
 
@@ -13,16 +14,20 @@ public sealed class UserSteps
     private readonly UsersClient _usersClient;
     private readonly AuthenticationClient _authenticationClient;
     private readonly AuthenticationContext _authenticationContext;
+    private readonly ILogger _logger;
 
-    public UserSteps(UsersClient usersClient, AuthenticationClient authenticationClient, AuthenticationContext authenticationContext)
+    public UserSteps(UsersClient usersClient, AuthenticationClient authenticationClient, AuthenticationContext authenticationContext, ILogger logger)
     {
         _usersClient = usersClient;
         _authenticationClient = authenticationClient;
         _authenticationContext = authenticationContext;
+        _logger = logger;
     }
 
     public async Task<ApiResponse<RegisterUserResponse>> RegisterUserAsync(User user, CancellationToken cancellationToken = default)
     {
+        _logger.Information($"Registering user '{user.Email}' over the API.");
+
         var request = new RegisterUserRequest
         {
             Email = user.Email,
@@ -47,6 +52,8 @@ public sealed class UserSteps
 
     public async Task<string> LoginUserAsync(User user, CancellationToken cancellationToken = default)
     {
+        _logger.Information($"Signing in '{user.Email}' over the API.");
+
         var request = new LoginRequest
         {
             Email = user.Email,
@@ -67,6 +74,8 @@ public sealed class UserSteps
         _authenticationContext.BasketId = authentication.BasketId;
 
         _authenticationContext.Email = authentication.Email ?? user.Email;
+
+        _logger.Information($"'{user.Email}' is signed in over the API, the basket of the customer is basket {_authenticationContext.BasketId}.");
 
         return _authenticationContext.Token;
     }

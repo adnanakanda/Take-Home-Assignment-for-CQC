@@ -8,6 +8,8 @@ public sealed class BasketClient : ApiClientBase
 {
     private const string BasketEndpoint = "/api/BasketItems";
 
+    private const string BasketOfCustomerEndpoint = "/rest/basket/{basketId}";
+
 
     public BasketClient(HttpClient client) : base(client)
     {
@@ -18,4 +20,12 @@ public sealed class BasketClient : ApiClientBase
         CancellationToken cancellationToken = default)
         =>
         PostAsync<BasketItemRequest, BasketResponse>(BasketEndpoint, request, cancellationToken);
+
+    public Task<ApiResponse<BasketDetailsResponse>> GetBasketAsync(
+        int basketId,
+        CancellationToken cancellationToken = default)
+        =>
+        GetAsync<BasketDetailsResponse>(
+            BasketOfCustomerEndpoint.Replace("{basketId}", basketId.ToString()),
+            cancellationToken);
 }

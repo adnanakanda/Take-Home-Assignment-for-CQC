@@ -1,11 +1,11 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using SeniorCQCAssignment.Framework.Logging;
 
 namespace SeniorCQCAssignment.Framework.Elements;
 
-public class Button : BaseElement
+public class Element : BaseElement
 {
-    public Button(
+    public Element(
         IWebDriver driver,
         By locator,
         string name,

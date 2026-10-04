@@ -1,15 +1,19 @@
 ﻿using OpenQA.Selenium;
-using SeniorCQCAssignment.Framework.Elements;
+using SeniorCQCAssignment.Framework.Logging;
 
-namespace SeniorCQCAssignmnet.Tests.AQFramework.Elements
+namespace SeniorCQCAssignment.Framework.Elements;
+
+public class Label : BaseElement
 {
-    public class Label : BaseElement
+    public Label(
+        IWebDriver driver,
+        By locator,
+        string name,
+        TimeSpan timeout,
+        ILogger logger)
+        : base(driver, locator, name, timeout, logger)
     {
-        public Label(IWebDriver driver, By locator, string name, TimeSpan timeout)
-            : base(driver, locator, name, timeout)
-        {
-        }
-
-        public string Text => GetText();
     }
+
+    public string Text => GetText();
 }

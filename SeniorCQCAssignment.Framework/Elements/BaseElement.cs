@@ -1,18 +1,16 @@
 ﻿using OpenQA.Selenium;
+using SeniorCQCAssignment.Framework.Logging;
 using SeniorCQCAssignment.Framework.Waits;
 
 namespace SeniorCQCAssignment.Framework.Elements;
 
 public abstract class BaseElement
 {
-    protected BaseElement(
-        IWebDriver driver,
-        By locator,
-        string name,
-        TimeSpan timeout)
+    protected BaseElement(IWebDriver driver, By locator, string name, TimeSpan timeout, ILogger logger)
     {
         Driver = driver ?? throw new ArgumentNullException(nameof(driver));
         Locator = locator ?? throw new ArgumentNullException(nameof(locator));
+        Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -36,11 +34,20 @@ public abstract class BaseElement
 
     protected WaitHelper Wait { get; }
 
+    protected ILogger Logger { get; }
+
+    protected virtual bool IsSecret => false;
+
     protected IWebElement VisibleElement => Wait.WaitForVisible(Locator);
 
     protected IWebElement ClickableElement => Wait.WaitForClickable(Locator);
 
-    public virtual void Click() => ClickableElement.Click();
+    public virtual void Click()
+    {
+        Logger.Information($"Clicking '{Name}'.");
+
+        ClickableElement.Click();
+    }
 
     public virtual string GetText() => VisibleElement.Text;
 
@@ -73,4 +80,17 @@ public abstract class BaseElement
             return false;
         }
     }
+
+    public virtual bool IsDisplayedNow()
+    {
+        var elements = Driver.FindElements(Locator);
+
+        return elements.Count > 0 && elements[0].Displayed;
+    }
+
+    public virtual bool WaitUntilInvisible() => Wait.WaitForInvisible(Locator);
+
+    public virtual IWebElement WaitForText(string expectedText) => Wait.WaitForText(Locator, expectedText);
+
+    protected string ValueForLog(string value) => IsSecret ? "***" : value;
 }

@@ -1,4 +1,3 @@
-using SeniorCQCAssignment.Automation.Steps.Api;
 using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
 using SeniorCQCAssignment.Tests.TestData;
@@ -12,11 +11,8 @@ public class ProductsTests : ApiTestBase
     [Category(Categories.Smoke)]
     public async Task Search_Product(ProductSearchCase productsData)
     {
-        //Arrange
-        var productSteps = new ProductSteps(ProductsClient);
-
         //Act
-        var products = await productSteps.SearchProductAsync(productsData.Query);
+        var products = await ProductSteps.SearchProductAsync(productsData.Query);
 
         //Assert
         Assert.Multiple(() =>
