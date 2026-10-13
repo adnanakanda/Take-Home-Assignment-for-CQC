@@ -1,6 +1,7 @@
 ﻿using SeniorCQCAssignment.Automation.ApiClients;
 using SeniorCQCAssignment.Automation.Exceptions;
 using SeniorCQCAssignment.Automation.Models.Api.Responses;
+using SeniorCQCAssignment.Framework.HTTP;
 using SeniorCQCAssignment.Framework.Logging;
 
 namespace SeniorCQCAssignment.Automation.Steps.Api;
@@ -32,6 +33,13 @@ public sealed class ProductSteps
         _logger.Information($"The search for '{productName}' returned {products.Count} product(s): {string.Join(", ", products.Select(product => product.Name))}.");
 
         return products;
+    }
+
+    public async Task<ApiResponse<ProductsResponse>> SearchProductResponseAsync(string productName)
+    {
+        _logger.Information($"Reading the answer to a product search for '{productName}' over the API, body included.");
+
+        return await _productsClient.SearchAsync(productName);
     }
 
     public async Task<ProductResponse> FindProductAsync(string productName)

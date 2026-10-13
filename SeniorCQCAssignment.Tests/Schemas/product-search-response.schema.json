@@ -1,0 +1,82 @@
+{
+  "title": "Product search response",
+  "description": "What GET /rest/products/search?q=<text> answers with when the search succeeds. Only what the tests read is required, so a field the application adds later is not a failure here: the tests read id, name and price, and demanding the whole product would turn every product change into a red build for no reason.",
+  "type": "object",
+  "required": [
+    "status",
+    "data"
+  ],
+  "properties": {
+    "status": {
+      "const": "success",
+      "description": "A search that worked answers 'success' with the data below. A refused or failed call answers with an error envelope instead, which is a different response and is not what this schema describes."
+    },
+    "data": {
+      "type": "array",
+      "description": "The products that match the search. An empty array is a valid answer when nothing matches.",
+      "items": {
+        "$ref": "#/$defs/product"
+      }
+    }
+  },
+  "$defs": {
+    "product": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "deluxePrice",
+        "image",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The number the application knows the product by, which is what a basket item is written with."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Free text, and it may hold the markup the shop renders with, so no pattern is put on it."
+        },
+        "price": {
+          "type": "number",
+          "minimum": 0,
+          "description": "A price that lands on a whole number arrives as 2 and not as 2.0, which is why this is a number and not an integer."
+        },
+        "deluxePrice": {
+          "type": "number",
+          "minimum": 0
+        },
+        "image": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "A timestamp the way the database writes it, for example '2026-10-04 00:11:52.012 +00:00'. That is why no 'date-time' format is claimed here: the format would be right and the values would still be refused."
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "deletedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Null for a product the shop still sells."
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://seniorcqcassignment.local/schemas/product-search-response.schema.json"
+}

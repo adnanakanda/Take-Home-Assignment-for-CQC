@@ -32,6 +32,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Schemas\*.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Using Include="NUnit.Framework" />
 	</ItemGroup>
 
