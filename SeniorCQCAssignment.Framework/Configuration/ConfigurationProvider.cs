@@ -4,6 +4,9 @@ namespace SeniorCQCAssignment.Framework.Configuration;
 
 public static class ConfigurationProvider
 {
+    private const int DefaultExplicitWaitSeconds = 10;
+    private const int DefaultHttpTimeoutSeconds = 60;
+
     public static TestConfiguration Load()
     {
         var environment = Environment.GetEnvironmentVariable("TestSettings__Environment") ?? "local";
@@ -15,21 +18,54 @@ public static class ConfigurationProvider
             .AddEnvironmentVariables()
             .Build();
 
-        var section = configuration.GetSection("TestSettings");
+        var settings = configuration.GetSection("TestSettings");
 
         return new TestConfiguration
         {
-            Environment = section["Environment"] ?? environment,
+            Environment = settings["Environment"] ?? environment,
 
-            BaseUrl = section["BaseUrl"] ?? throw new InvalidOperationException("TestSettings:BaseUrl is not configured."),
+            BaseUrl = ReadText(settings, "BaseUrl"),
 
-            Browser = section["Browser"] ?? "chrome",
+            Browser = settings["Browser"] ?? "chrome",
 
-            Headless = bool.TryParse(section["Headless"], out var headless) && headless,
+            Headless = ReadFlag(settings, "Headless", false),
 
-            ExplicitWaitSeconds = int.TryParse(section["ExplicitWaitSeconds"], out var waitSeconds) ? waitSeconds : 10,
+            ExplicitWaitSeconds = ReadSeconds(settings, "ExplicitWaitSeconds", DefaultExplicitWaitSeconds),
 
-            HttpTimeoutSeconds = int.TryParse(section["HttpTimeoutSeconds"], out var timeoutSeconds) ? timeoutSeconds : 60
+            HttpTimeoutSeconds = ReadSeconds(settings, "HttpTimeoutSeconds", DefaultHttpTimeoutSeconds)
         };
+    }
+
+    private static string ReadText(IConfigurationSection settings, string key) =>
+        string.IsNullOrWhiteSpace(settings[key])
+            ? throw new InvalidOperationException($"TestSettings:{key} is not configured.")
+            : settings[key]!;
+
+    private static bool ReadFlag(IConfigurationSection settings, string key, bool defaultValue)
+    {
+        var configured = settings[key];
+
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            return defaultValue;
+        }
+
+        return bool.TryParse(configured, out var value)
+            ? value
+            : throw new InvalidOperationException($"TestSettings:{key} is not true or false: '{configured}'.");
+    }
+
+    private static int ReadSeconds(IConfigurationSection settings, string key, int defaultValue)
+    {
+        var configured = settings[key];
+
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            return defaultValue;
+        }
+
+        return int.TryParse(configured, out var seconds) && seconds > 0
+            ? seconds
+            : throw new InvalidOperationException($"TestSettings:{key} is not a number of seconds greater than zero: '{configured}'.");
     }
 }

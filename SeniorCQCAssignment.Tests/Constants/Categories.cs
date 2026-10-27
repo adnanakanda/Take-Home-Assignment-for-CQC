@@ -7,4 +7,5 @@ public static class Categories
     public const string Smoke = "smoke";
     public const string Regression = "regression";
     public const string KnownDefect = "known-defect";
+    public const string Unit = "unit";
 }
