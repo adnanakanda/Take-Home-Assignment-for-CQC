@@ -9,6 +9,9 @@ namespace SeniorCQCAssignment.Tests.Fixtures;
 
 public sealed class ApiTestContext : IDisposable
 {
+    private readonly string _contextToken;
+    private ApiResponse<object>? _lastResponse;
+
     public ApiTestContext(TestConfiguration configuration, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -26,6 +29,11 @@ public sealed class ApiTestContext : IDisposable
             logger,
             configuration.HttpTimeout,
             new AuthenticationHandler(AuthenticationContext));
+
+        _contextToken = HttpContextStore.Register(this);
+
+        Client.DefaultRequestHeaders.TryAddWithoutValidation("X-Test-Context", _contextToken);
+        AuthenticatedClient.DefaultRequestHeaders.TryAddWithoutValidation("X-Test-Context", _contextToken);
 
         UsersClient = new UsersClient(Client);
         AuthenticationClient = new AuthenticationClient(Client);
@@ -57,8 +65,23 @@ public sealed class ApiTestContext : IDisposable
 
     public BasketSteps BasketSteps { get; }
 
+    public ApiResponse<object>? LastResponse => _lastResponse;
+
+    internal void RecordResponse<T>(ApiResponse<T> response)
+    {
+        _lastResponse = new ApiResponse<object>
+        {
+            StatusCode = response.StatusCode,
+            RequestBody = response.RequestBody,
+            ResponseBody = response.ResponseBody,
+            Data = response.Data
+        };
+    }
+
     public void Dispose()
     {
+        HttpContextStore.Unregister(_contextToken);
+
         AuthenticatedClient.Dispose();
 
         Client.Dispose();

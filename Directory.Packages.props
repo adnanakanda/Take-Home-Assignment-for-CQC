@@ -24,6 +24,9 @@
 
 		<!-- JSON schema -->
 		<PackageVersion Include="JsonSchema.Net" Version="9.4.0" />
+
+		<!-- Allure reporting -->
+		<PackageVersion Include="Allure.NUnit" Version="2.12.1" />
 	</ItemGroup>
 
 </Project>

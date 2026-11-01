@@ -1,0 +1,9 @@
+# Simple .dockerignore
+bin/
+obj/
+.git/
+.vs/
+TestResults/
+allure-results/
+*.user
+*.suo

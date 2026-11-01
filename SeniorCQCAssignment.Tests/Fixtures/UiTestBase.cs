@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+using NUnit.Framework.Interfaces;
+using OpenQA.Selenium;
 using SeniorCQCAssignment.Automation.Components;
 using SeniorCQCAssignment.Automation.Pages;
 using SeniorCQCAssignment.Automation.Steps.Ui;
@@ -6,6 +7,7 @@ using SeniorCQCAssignment.Framework.WebDriver;
 
 namespace SeniorCQCAssignment.Tests.Fixtures;
 
+[NonParallelizable]
 public abstract class UiTestBase : TestFixtureBase
 {
     protected IWebDriver Driver { get; private set; } = null!;
@@ -54,10 +56,14 @@ public abstract class UiTestBase : TestFixtureBase
     {
         try
         {
-            Driver.Quit();
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                AttachScreenshot(Driver);
+            }
         }
         finally
         {
+            Driver.Quit();
             Driver.Dispose();
         }
     }

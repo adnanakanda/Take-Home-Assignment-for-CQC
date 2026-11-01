@@ -28,7 +28,7 @@ public class JsonSchemaValidatorTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void GetValidationErrors_Accepts_A_Document_That_Fits()
+    public void GetValidationErrors_ReturnsEmptyForValidDocument()
     {
         const string document = """{"status":"success","data":[{"name":"Apple Juice","price":1.99}]}""";
 
@@ -39,7 +39,7 @@ public class JsonSchemaValidatorTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void GetValidationErrors_Says_Where_The_Document_Does_Not_Fit_And_What_Was_Expected()
+    public void GetValidationErrors_ReturnsErrorsForInvalidType()
     {
         const string document = """{"status":"success","data":[{"name":"Apple Juice","price":"1.99"}]}""";
 
@@ -63,7 +63,7 @@ public class JsonSchemaValidatorTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void GetValidationErrors_Reports_A_Missing_Required_Property()
+    public void GetValidationErrors_ReturnsErrorsForMissingRequiredProperty()
     {
         const string document = """{"status":"success","data":[{"name":"Apple Juice"}]}""";
 
@@ -82,7 +82,7 @@ public class JsonSchemaValidatorTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void GetValidationErrors_Refuses_To_Validate_Nothing()
+    public void GetValidationErrors_ThrowsForNullOrEmptyDocument()
     {
         Assert.That(
             () => JsonSchemaValidator.GetValidationErrors(string.Empty, Schema),

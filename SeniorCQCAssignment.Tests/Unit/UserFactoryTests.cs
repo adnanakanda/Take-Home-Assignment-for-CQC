@@ -7,7 +7,7 @@ public class UserFactoryTests
 {
     [Test]
     [Category(Categories.Unit)]
-    public void Create_Makes_An_Address_The_Application_Accepts()
+    public void Create_ReturnsUserWithValidEmail()
     {
         var user = UserFactory.Create();
 
@@ -24,7 +24,7 @@ public class UserFactoryTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Create_Makes_A_Strong_Password()
+    public void Create_ReturnsUserWithStrongPassword()
     {
         var user = UserFactory.Create();
 
@@ -40,7 +40,7 @@ public class UserFactoryTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Create_Picks_A_Security_Question_The_Registration_Form_Offers()
+    public void Create_ReturnsUserWithValidSecurityQuestion()
     {
         var user = UserFactory.Create();
 

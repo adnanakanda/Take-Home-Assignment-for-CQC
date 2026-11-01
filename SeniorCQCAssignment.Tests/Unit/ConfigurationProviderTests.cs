@@ -3,7 +3,6 @@ using SeniorCQCAssignment.Tests.Constants;
 
 namespace SeniorCQCAssignment.Tests.Unit;
 
-[NonParallelizable]
 public class ConfigurationProviderTests
 {
     private const string EnvironmentVariable = "TestSettings__Environment";
@@ -12,7 +11,7 @@ public class ConfigurationProviderTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Load_Reads_An_Address_And_Timeouts_The_Run_Can_Use()
+    public void Load_ReturnsValidConfiguration()
     {
         var configuration = ConfigurationProvider.Load();
 
@@ -28,7 +27,7 @@ public class ConfigurationProviderTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Load_Lets_An_Environment_Variable_Override_The_Configuration_Files()
+    public void Load_EnvironmentVariableOverridesConfiguration()
     {
         const string FromTheEnvironment = "http://host-from-the-environment:3001";
 
@@ -39,7 +38,7 @@ public class ConfigurationProviderTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Load_Takes_The_Settings_Of_The_Environment_It_Is_Told_To_Run_In()
+    public void Load_UsesEnvironmentSpecificConfiguration()
     {
         var configuration = WithEnvironmentVariable(EnvironmentVariable, "ci", ConfigurationProvider.Load);
 
@@ -52,7 +51,7 @@ public class ConfigurationProviderTests
 
     [Test]
     [Category(Categories.Unit)]
-    public void Load_Refuses_A_Setting_That_Is_There_But_Cannot_Be_Read()
+    public void Load_ThrowsExceptionForInvalidConfigurationValue()
     {
         var failure = Assert.Throws<InvalidOperationException>(
             () => WithEnvironmentVariable(HttpTimeoutVariable, "half a minute", ConfigurationProvider.Load));

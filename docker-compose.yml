@@ -1,0 +1,83 @@
+services:
+  juice-shop:
+    image: bkimminich/juice-shop:v17.1.1
+    container_name: juice-shop-sut
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks:
+      - test-network
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests-runner
+    depends_on:
+      juice-shop:
+        condition: service_healthy
+    environment:
+      - TestSettings__Environment=ci
+      - TestSettings__BaseUrl=http://juice-shop:3000
+      - TestSettings__Browser=chrome
+      - TestSettings__Headless=true
+    volumes:
+      - ./TestResults:/app/TestResults
+      - ./allure-results:/app/allure-results
+    networks:
+      - test-network
+    shm_size: 2gb
+    command: ["dotnet", "test", "SeniorCQCAssignment.slnx", "--no-restore", "-c", "Release", "--logger", "console;verbosity=normal", "--results-directory", "/app/TestResults"]
+
+  tests-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests-runner-api
+    depends_on:
+      juice-shop:
+        condition: service_healthy
+    environment:
+      - TestSettings__Environment=ci
+      - TestSettings__BaseUrl=http://juice-shop:3000
+      - TestSettings__Browser=chrome
+      - TestSettings__Headless=true
+    volumes:
+      - ./TestResults:/app/TestResults
+      - ./allure-results:/app/allure-results
+    networks:
+      - test-network
+    shm_size: 2gb
+    profiles: ["api"]
+    command: ["dotnet", "test", "SeniorCQCAssignment.slnx", "--no-restore", "-c", "Release", "--filter", "Category=api", "--logger", "console;verbosity=normal", "--results-directory", "/app/TestResults"]
+
+  tests-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests-runner-ui
+    depends_on:
+      juice-shop:
+        condition: service_healthy
+    environment:
+      - TestSettings__Environment=ci
+      - TestSettings__BaseUrl=http://juice-shop:3000
+      - TestSettings__Browser=chrome
+      - TestSettings__Headless=true
+    volumes:
+      - ./TestResults:/app/TestResults
+      - ./allure-results:/app/allure-results
+    networks:
+      - test-network
+    shm_size: 2gb
+    profiles: ["ui"]
+    command: ["dotnet", "test", "SeniorCQCAssignment.slnx", "--no-restore", "-c", "Release", "--filter", "Category=ui", "--logger", "console;verbosity=normal", "--results-directory", "/app/TestResults"]
+
+networks:
+  test-network:
+    driver: bridge

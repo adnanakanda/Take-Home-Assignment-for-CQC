@@ -24,6 +24,8 @@
 		<PackageReference Include="NUnit3TestAdapter">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+
+		<PackageReference Include="Allure.NUnit" />
 	</ItemGroup>
 
 	<ItemGroup>

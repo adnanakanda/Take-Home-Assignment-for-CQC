@@ -1,3 +1,4 @@
+using System.Net;
 using SeniorCQCAssignment.Automation.Models.Api.Requests;
 using SeniorCQCAssignment.Automation.Models.Api.Responses;
 using SeniorCQCAssignment.Automation.Models.Domain;
@@ -5,7 +6,6 @@ using SeniorCQCAssignment.Automation.TestData;
 using SeniorCQCAssignment.Framework.HTTP;
 using SeniorCQCAssignment.Tests.Constants;
 using SeniorCQCAssignment.Tests.Fixtures;
-using System.Net;
 
 namespace SeniorCQCAssignment.Tests.Api;
 

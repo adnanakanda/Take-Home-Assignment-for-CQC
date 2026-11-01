@@ -8,7 +8,7 @@ public class ApiResponseTests
 {
     [TestCaseSource(typeof(HttpStatusCodeData), nameof(HttpStatusCodeData.StatusCodes))]
     [Category(Categories.Unit)]
-    public void IsSuccessStatusCode_Only_Says_Yes_To_A_2xx_Answer(HttpStatusCodeCase statusCodeCase)
+    public void IsSuccessStatusCode_ReturnsExpectedResult(HttpStatusCodeCase statusCodeCase)
     {
         var response = new ApiResponse<string>
         {

@@ -1,3 +1,5 @@
+using NUnit.Framework.Interfaces;
+using OpenQA.Selenium;
 using SeniorCQCAssignment.Automation.Models.Api.Requests;
 using SeniorCQCAssignment.Automation.Models.Api.Responses;
 using SeniorCQCAssignment.Automation.Models.Domain;
@@ -26,7 +28,20 @@ public abstract class TestFixtureBase
     }
 
     [TearDown]
-    public void TearDownTestContext() => Api.Dispose();
+    public void TearDownTestContext()
+    {
+        try
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                AttachApiFailureDetails();
+            }
+        }
+        finally
+        {
+            Api.Dispose();
+        }
+    }
 
     protected async Task<ApiResponse<RegisterUserResponse>> RegisterUserAsync(
         User user,
@@ -65,5 +80,36 @@ public abstract class TestFixtureBase
         {
             Logger.Information($"Created test user '{email}' (id {createdUser.Id}).");
         }
+    }
+
+    private void AttachApiFailureDetails()
+    {
+        var lastResponse = Api.LastResponse;
+
+        if (lastResponse is null)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(lastResponse.RequestBody))
+        {
+            TestContext.AddTestAttachment(lastResponse.RequestBody, "api-request-body.txt");
+        }
+
+        TestContext.AddTestAttachment(lastResponse.ResponseBody, $"api-response-{(int)lastResponse.StatusCode}.txt");
+    }
+
+    protected static void AttachScreenshot(IWebDriver driver)
+    {
+        if (driver is not ITakesScreenshot screenshotTaker)
+        {
+            return;
+        }
+
+        var image = screenshotTaker.GetScreenshot();
+        var path = Path.Combine(Path.GetTempPath(), $"failure-{Guid.NewGuid():N}.png");
+        image.SaveAsFile(path);
+
+        TestContext.AddTestAttachment(path, "screenshot.png");
     }
 }
